@@ -50,22 +50,18 @@ class Chat implements Runnable{
             Serversocket.user.put(nicknum,writer);
 
             String str="";
+            msgToAll(-1,"hello every one ,"+nicknum+" is Online now");
             writer.println("hello ,your name is :"+nicknum);
 
             while(true){
                 if (((str=reader.readLine())==null)) break;
-                if(str.trim().equals("bye")){
 
-                    System.out.println(nicknum+" is closed!");
-                    Serversocket.user.remove(nicknum);
-                };
                 if(str.startsWith("@")){
                     String[] single=str.replace("@","").split(":");
                     msgToSingle(nicknum,Integer.valueOf(single[0]),single[1]);
                 }else{
-                    msgToAll(str);
+                    msgToAll(nicknum,str);
                 }
-                System.out.println("user size is :"+Serversocket.user.size()+"values:"+Serversocket.user.size());
                 System.out.println(str);
 
             }
@@ -77,10 +73,17 @@ class Chat implements Runnable{
 
     }
 
-    private synchronized void msgToAll(String str){
+    private synchronized void msgToAll(Integer nickname,String str){
+
         for(PrintWriter writer:Serversocket.user.values()){
-            writer.println("All:"+str);
-            writer.flush();
+            if (str.equals("bye")){
+                writer.println("Server: "+nickname+" is exited! ");
+            }else if (nickname.equals(-1)){
+                writer.println("Server:"+str);
+            } else{
+                writer.println(nickname+" said: "+str);
+            }
+
         }
     }
 
